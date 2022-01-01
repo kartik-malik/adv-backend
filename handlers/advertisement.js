@@ -5,11 +5,12 @@ exports.postAdvertisement = function (req, res, next) {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const userId = req.body.userId;
-
+  const publishStatus = req.body.publishStatus;
   const description = req.body.description;
   Product.create({
     imageUrl,
     title,
+    publishStatus,
     description,
     price,
     userId,
@@ -23,9 +24,9 @@ exports.postAdvertisement = function (req, res, next) {
 };
 exports.getAdvertisement = function (req, res, next) {
   const id = req.params.id;
-  Product.findByPk(id)
+  Product.findByPk(id, { include: user })
     .then((response) => {
-      res.send({ data: response });
+      res.send(response);
     })
     .catch((err) => {
       next(err);
@@ -60,13 +61,17 @@ exports.deleteAdvertisement = async function (req, res, next) {
 };
 exports.updateAdvertisement = async function (req, res, next) {
   const productId = req.params.productId;
+  const title = req.body.title;
+  const imageUrl = req.body.imageUrl;
+  const price = req.body.price;
   const publishStatus = req.body.publishStatus;
+  const description = req.body.description;
   try {
     const data = await Product.update(
-      { publishStatus },
+      { price, publishStatus, description, imageUrl, title },
       { where: { id: productId } }
     );
-    res.send({ message: "deleted succecfully" });
+    res.send({ message: "updated succecfully" });
   } catch (err) {
     next(err);
   }
